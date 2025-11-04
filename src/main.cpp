@@ -9,19 +9,13 @@ TenzoRS485 leftHipCell                          (newSerial, 2);
 TenzoRS485 leftKneeCell                         (newSerial, 4);
 
 TenzoRS485 leftHeelLeftCell                     (newSerial, 7); 
-// TenzoRS485 leftHeelRightCell                    (newSerial, 21);
-
 TenzoRS485 leftMetatarsalLeftCell               (newSerial, 8); 
-// TenzoRS485 leftMetatarsalRightCell              (newSerial, 21);
 
 TenzoRS485 rightHipCell                         (newSerial, 3);
 TenzoRS485 rightKneeCell                        (newSerial, 1);
 
 TenzoRS485 rightHeelLeftCell                    (newSerial, 6); 
-TenzoRS485 rightHeelRightCell                   (newSerial, 5);
-
-// TenzoRS485 rightMetatarsalLeftCell              (newSerial, 21); 
-// TenzoRS485 rightMetatarsalRightCell             (newSerial, 21);
+TenzoRS485 rightMetatarsalRightCell             (newSerial, 5);
 
 inline bool getPermissionToStart() {
   if(Serial.available() > 0) {
@@ -29,7 +23,7 @@ inline bool getPermissionToStart() {
     delay(10);
     _input.trim();
     Serial.println(_input);
-    if(_input.equals("Tenzo")) {
+    if(_input.equals("Start")) {
       Serial.println("Tenzo");
       return false;
     }
@@ -37,6 +31,14 @@ inline bool getPermissionToStart() {
   }
   return true;
 }
+enum SYSTEM_STATES : uint8_t {
+    SS_MAIN_MENU,                   
+    SS_EXERCISE_TURN_FOOT,              // 1
+    SS_EXERCISE_TURN_HIP,               // 5.1
+    SS_MOVABLE_SURFACE_WALK,            // 8.1
+};
+
+SYSTEM_STATES system_state = SS_MAIN_MENU;
 
 void setup() {
   Serial.begin(115200);
@@ -51,12 +53,138 @@ void setup() {
   rightHipCell.begin(115200);
   rightKneeCell.begin(115200);
   rightHeelLeftCell.begin(115200);
-  rightHeelRightCell.begin(115200);
+  rightMetatarsalRightCell.begin(115200);
   // rightMetatarsalLeftCell.begin(115200);
   // rightMetatarsalRightCell.begin(115200);
 }
 
 void loop() {
+  Serial.println("AFDf");
+  switch (system_state){
+    case SS_MAIN_MENU:{
+      if(Serial.available() > 0) {
+        String _input = Serial.readStringUntil('\n');
+        _input.trim();
+        if (_input == "Walk" || _input == "Movable" || _input == "Sedentary") {
+          system_state = SS_MOVABLE_SURFACE_WALK;
+          return;
+        }    
+        else if (_input == "Foot" || _input == "FootS") {
+          system_state = SS_EXERCISE_TURN_FOOT;
+          return;
+        }
+        else if (_input == "Hip" || _input == "HipS" || _input == "HipKnee" || _input == "HipKneeS" || _input == "Knee" || _input == "KneeS") {
+          system_state = SS_EXERCISE_TURN_HIP;
+          return;
+        }
+      }
+    } break;
+    case SS_MOVABLE_SURFACE_WALK:{
+      if(Serial.available() > 0) {
+        String _input = Serial.readStringUntil('\n');
+        _input.trim();
+        if (_input == "Stop") system_state = SS_MAIN_MENU;
+      }
+
+      // Serial.print("<FORCES:");
+      // Serial.print(leftHipCell.getCell());
+      // Serial.print(";");
+      // Serial.print(leftMetatarsalLeftCell.getCell());
+      // Serial.print(";");
+      // Serial.print(leftHeelLeftCell.getCell());
+      // Serial.print(";");
+      // Serial.print(leftKneeCell.getCell());
+      // Serial.print(";");
+      // Serial.print(rightHipCell.getCell());
+      // Serial.print(";");
+      // Serial.print(rightMetatarsalRightCell.getCell());
+      // Serial.print(";");
+      // Serial.print(rightHeelLeftCell.getCell());
+      // Serial.print(";");
+      // Serial.print(rightKneeCell.getCell());
+      // Serial.print(">");
+
+      Serial.print("<FORCES:");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(">");
+    } break;
+    case SS_EXERCISE_TURN_FOOT:{
+      if(Serial.available() > 0) {
+        String _input = Serial.readStringUntil('\n');
+        _input.trim();
+        if (_input == "Stop") system_state = SS_MAIN_MENU;
+      }
+
+      // Serial.print("<FORCES:");
+      // Serial.print(leftMetatarsalLeftCell.getCell());
+      // Serial.print(";");
+      // Serial.print(leftHeelLeftCell.getCell());
+      // Serial.print(";");
+      // Serial.print(leftKneeCell.getCell());
+      // Serial.print(";");
+      // Serial.print(rightMetatarsalRightCell.getCell());
+      // Serial.print(";");
+      // Serial.print(rightHeelLeftCell.getCell());
+      // Serial.print(";");
+      // Serial.print(rightKneeCell.getCell());
+      // Serial.print(">");
+
+      Serial.print("<FORCES:");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(">");
+    } break;
+    case SS_EXERCISE_TURN_HIP:{
+      if(Serial.available() > 0) {
+        String _input = Serial.readStringUntil('\n');
+        _input.trim();
+        if (_input == "Stop") system_state = SS_MAIN_MENU;
+      }
+
+      // Serial.print("<FORCES:");
+      // Serial.print(leftHipCell.getCell());
+      // Serial.print(";");
+      // Serial.print(leftKneeCell.getCell());
+      // Serial.print(";");
+      // Serial.print(rightHipCell.getCell());
+      // Serial.print(";");
+      // Serial.print(rightKneeCell.getCell());
+      // Serial.print(">");
+
+      Serial.print("<FORCES:");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(";");
+      Serial.print(rand()%30);
+      Serial.print(">");
+    } break;
+  }
 
   if(PRINT_CELL == 1) { 
     Serial.print("Л. бедро.: ");              Serial.print(leftHipCell.getCell());
@@ -70,7 +198,7 @@ void loop() {
     Serial.print(" П. бедро.: ");              Serial.print(rightHipCell.getCell());
     Serial.print(" П. колено.: ");             Serial.print(rightKneeCell.getCell());
     Serial.print(" П. пятка(л): ");            Serial.print(rightHeelLeftCell.getCell());
-    Serial.print(" П. пятка(п): ");            Serial.println(rightHeelRightCell.getCell());
+    Serial.print(" П. пятка(п): ");            Serial.println(rightMetatarsalRightCell.getCell());
     // Serial.print("П. носок(л): ");            Serial.print(rightMetatarsalLeftCell.getCell());
     // Serial.print("П. носок(п): ");            Serial.println(rightMetatarsalRightCell.getCell());
   }
